@@ -1,0 +1,86 @@
+---
+title: "Bee Colony Project"
+author: 'Kemal Tekin'
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r}
+library(rmarkdown)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(scales)
+theme_set(theme_light())
+```
+
+```{r}
+colony <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-01-11/colony.csv')
+stres <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-01-11/stressor.csv')
+
+
+
+```
+
+## States And Colony Lost Percentages Corelation graph
+
+```{r}
+colony %>%
+head(20) %>%
+mutate(str_to_title(state)) %>%
+ggplot(aes(reorder(state,+colony_lost_pct),colony_lost_pct, fill = state)) + geom_col() + 
+  scale_y_continuous(labels = number_format()) +  
+coord_flip() +
+  labs(title = 'Lost Percentages Of Bee Colonies By States In 2015', 
+    x = "States" ,  y = "Colony Lost Percentages") +
+  theme(legend.position = "none")
+```
+
+## Colonies Number by state
+
+```{r}
+colony %>%
+  head(20) %>% 
+  filter(colony_n > 0) %>%
+  ggplot(aes(reorder(state, +colony_n),colony_n,fill = state)) + geom_col() +
+coord_flip() +
+  labs(title = "Colony numbers by States ",
+       y = "Colony Numbers") + 
+theme(legend.position = 'none')
+```
+## Percent of colonies renovated
+
+```{r}
+colony %>%
+  head(20) %>% 
+  filter(colony_reno_pct > 0) %>%
+  ggplot(aes(reorder(state, +colony_reno_pct),colony_reno_pct,fill = state)) + geom_col() +
+coord_flip() +
+  labs(title = "Colony Renovated percentages by states ",
+       y = "Colony Renovated Percentages") + 
+theme(legend.position = 'none')
+```
+
+## Colonies Lost and Renovated percentages in facet graph
+
+```{r}
+colony %>%
+head(20) %>%
+  filter(colony_reno_pct > 0) %>%
+mutate(str_to_title(state)) %>%
+ggplot(aes(x = colony_reno_pct, y = colony_lost_pct, fill = state)) + geom_col() +
+ facet_wrap(~ state) +
+  theme_bw() + coord_flip() + theme(legend.position = 'none') +
+  labs( y = "Lost Percentage", x = "Renovated Percentage")
+```
+
+## Stressors and stressors percentages by states
+
+```{r}
+stressor %>%
+  filter(stress_pct > 1) %>%
+  head(40) %>%
+  mutate(str_to_title(state)) %>%
+  ggplot(aes(reorder(state, +stress_pct),stress_pct,fill = stressor)) + geom_col() + coord_flip() + labs(y ='Stress Percentage',x = "")  
+```
+
